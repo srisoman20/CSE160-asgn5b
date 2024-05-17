@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My 3D Scene</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"  width="1000" height="550"></canvas>
+    <script type="module">
+      import * as THREE from "three";
+      import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+      import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader.js';
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+      
+
+      function main() {
+        const canvas = document.querySelector("#c");
+        const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+        const fov = 75;
+        const aspect = 2;
+        const near = 0.1;
+        const far = 100;
+        const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        camera.position.z = 15;
+
+        const scene = new THREE.Scene();
+
+        // Load Custom OBJ Model
+        // Cheeseburger/Hamburger.obj
+
+        const mtlLoader = new MTLLoader();
+        mtlLoader.load('Hamburger.mtl', (mtl) => {
+          mtl.preload();
+
+          const objLoader = new OBJLoader();
+          objLoader.setMaterials(mtl);
+          objLoader.load('Hamburger.obj', (root) => {
+            // Apply red material to all meshes in the loaded object
+            root.traverse((child) => {
+            if (child.isMesh) {
+              const redMaterial = new THREE.MeshPhongMaterial({
+                 color: 0xFFFF00
+            });
+            child.material = redMaterial;
+          }
+        });
+        scene.add(root);
+        root.position.y = -9;
+       });
+      });
+
+
+            
+        const boxWidth = 1;
+        const boxHeight = 1;
+        const boxDepth = 1;
+        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+        // // Load Textures
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load("wall.jpeg");
+
+        // const loader1 = new THREE.CubeTextureLoader();
+        // const texture1 = loader1.load([
+        //   'pos-x.jpeg',
+        //   'neg-x.jpeg',
+        //   'pos-y.jpeg',
+        //   'neg-y.jpeg',
+        //   'pos-z.jpeg',
+        //   'neg-z.jpeg',
+        // ]);
+        
+        const loader1 = new THREE.CubeTextureLoader();
+        const texture1 = loader1.load([
+          'space.jpeg',
+          'space.jpeg',
+          'space.jpeg',
+          'space.jpeg',
+          'space.jpeg',
+          'space.jpeg',
+        ]);
+
+        scene.background = texture1;
+
+        // // Apply Texture to Material
+        const material = new THREE.MeshPhongMaterial({ map: texture });
+
+        // Create Cubes with Textured Material
+        function makeInstance(geometry, material, x) {
+          const cube = new THREE.Mesh(geometry, material);
+          scene.add(cube);
+          cube.position.x = x;
+          cube.position.y = -8
+          return cube;
+        }
+
+        const cubes = [
+          makeInstance(geometry, material, 10)
+        ];
+
+        const cylinder_geo = new THREE.CylinderGeometry(1, 4, 5, 50);
+        const cmaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff }); //blue
+        const cylinder = new THREE.Mesh(cylinder_geo, cmaterial);
+        scene.add(cylinder);
+        cylinder.position.x = -10;
+        cylinder.position.y = -9;
+
+        const sphere_geo = new THREE.SphereGeometry(1, 50, 50);
+        const smaterial = new THREE.MeshPhongMaterial({ color: 0xffc2d1 }); // light pink
+        const sphere = new THREE.Mesh(sphere_geo, smaterial);
+        scene.add(sphere);
+        sphere.position.x = 15;
+        sphere.position.y = -8
+
+        // pluto
+        const pluto = new THREE.SphereGeometry(0.5, 30, 30);
+        const plmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/ds7WOMu.jpeg'
+        )
+        } );
+        const plut = new THREE.Mesh(pluto, plmat);
+        scene.add(plut);
+        plut.position.x = 20;
+
+        // neptune
+        const ngeo = new THREE.SphereGeometry(1, 50, 50);
+        const nmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/lyLpoMk.jpeg'
+        )
+        } );
+        const nep = new THREE.Mesh(ngeo, nmat);
+        scene.add(nep);
+        nep.position.x = 18; 
+
+        // uranus
+        const ugeo = new THREE.SphereGeometry(1, 50, 50);
+        const umat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/2kZNvFw.jpeg'
+        )
+        } );
+        const ur = new THREE.Mesh(ugeo, umat);
+        scene.add(ur);
+        ur.position.x = 15; 
+        //add ring
+
+        // saturn
+        const sgeo = new THREE.SphereGeometry(2, 50, 50);
+        const smat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/r9h0U9E.jpeg'
+        )
+        } );
+        const sat = new THREE.Mesh(sgeo, smat);
+        scene.add(sat);
+        sat.position.x = 11.5; 
+        //add ring
+
+        // jupiter
+        const jgeo = new THREE.SphereGeometry(3, 70, 70);
+        const jmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/KbVscNb.jpeg'
+        )
+        } );
+        const jup = new THREE.Mesh(jgeo, jmat);
+        scene.add(jup);
+        jup.position.x = 6;
+
+        // mars
+        const margeo = new THREE.SphereGeometry(1, 70, 70);
+        const marmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/6uxNerY.jpeg'
+        )
+        } );
+        const mars = new THREE.Mesh(margeo, marmat);
+        scene.add(mars);
+        mars.position.x = 2;
+
+        // earth
+        const egeo = new THREE.SphereGeometry(2, 90, 90);
+        const emat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/Ip19PQt.jpeg'
+        )
+        } );
+        const earth = new THREE.Mesh(egeo, emat);
+        scene.add(earth);
+        earth.position.x = -1;
+
+        // venus
+        const vengeo = new THREE.SphereGeometry(2, 90, 90);
+        const venmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/YuK3CzJ.jpeg'
+        )
+        } );
+        const ven = new THREE.Mesh(vengeo, venmat);
+        scene.add(ven);
+        ven.position.x = -5;
+
+        // mercury
+        const mergeo = new THREE.SphereGeometry(1, 70, 70);
+        const mermat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/SLgVbwD.jpeg'
+        )
+        } );
+        const merc = new THREE.Mesh(mergeo, mermat);
+        scene.add(merc);
+        merc.position.x = -10;
+
+        // sun
+        const sungeo = new THREE.SphereGeometry(5, 200, 200);
+        const sunmat = new THREE.MeshBasicMaterial( {
+    		map: new THREE.TextureLoader().load(
+        		'https://i.imgur.com/PWnSJQd.jpeg'
+        )
+        } );
+        const sun = new THREE.Mesh(sungeo, sunmat);
+        scene.add(sun);
+        sun.position.x = -17;
+
+
+        // Space ship
+        // 1. Body
+        const bodyGeometry = new THREE.CylinderGeometry(1, 1, 6, 32);
+        const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 7;
+        scene.add(body);
+
+        // 2. Cockpit 
+        const cockpitGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+        const cockpitMaterial = new THREE.MeshPhongMaterial({ color: 0x0000ff });
+        const cockpit = new THREE.Mesh(cockpitGeometry, cockpitMaterial);
+        cockpit.position.y = 10.5;
+        scene.add(cockpit);
+
+        // 3. Engine 
+        const engineGeometry = new THREE.BoxGeometry(0.8, 0.8, 3);
+        const engineMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const engine1 = new THREE.Mesh(engineGeometry, engineMaterial);
+        engine1.position.set(1.5, 4, 0);
+        scene.add(engine1);
+
+        const engine2 = engine1.clone();
+        engine2.position.set(-1.5, 4, 0);
+        scene.add(engine2);
+
+        // 4. Wings 
+        const wingGeometry = new THREE.BoxGeometry(0.5, 3, 1);
+        const wingMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+        const wing1 = new THREE.Mesh(wingGeometry, wingMaterial);
+        wing1.position.set(2, 7, 0);
+        scene.add(wing1);
+
+        const wing2 = wing1.clone();
+        wing2.position.set(-2, 7, 0);
+        scene.add(wing2);
+
+        // 5. Tail Fin 
+        const tailFinGeometry = new THREE.BoxGeometry(0.3, 2, 1);
+        const tailFinMaterial = new THREE.MeshPhongMaterial({ color: 0xffa500 });
+        const tailFin = new THREE.Mesh(tailFinGeometry, tailFinMaterial);
+        tailFin.position.set(0, 4, -1);
+        scene.add(tailFin);
+
+        // 6. Front Tip 
+        const tipGeometry = new THREE.ConeGeometry(0.6, 2, 32);
+        const tipMaterial = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+        const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+        tip.position.set(0, 11.5, 0);
+        scene.add(tip);
+
+        // 7. Bottom Fin 
+        const bottomFinGeometry = new THREE.BoxGeometry(0.5, 0.2, 2);
+        const bottomFinMaterial = new THREE.MeshPhongMaterial({ color: 0x8a2be2 });
+        const bottomFin = new THREE.Mesh(bottomFinGeometry, bottomFinMaterial);
+        bottomFin.position.set(0, 3.5, 0);
+        scene.add(bottomFin);
+
+
+
+        // Add Light (directional)
+        const color = 0x90EE90;
+        const intensity = 5;
+        const light = new THREE.DirectionalLight(color, intensity);
+        light.position.set(0, 10, 0);
+        scene.add(light);
+
+        // ambient light
+        const acolor = 0xFFC0CB;
+        const aintensity = 1;
+        const alight = new THREE.AmbientLight(acolor, aintensity);
+        scene.add(alight);
+
+        // hemisphere light
+        const skyColor = 0xB1E1FF;  // light blue
+        const groundColor = 0xB97A20;  // brownish orange
+        const hintensity = 3;
+        const hlight = new THREE.HemisphereLight(skyColor, groundColor, hintensity);
+        scene.add(hlight);
+
+        // Render Loop
+        function render(time) {
+          time *= 0.001;
+          cubes.forEach((cube, ndx) => {
+            const speed = 1 + ndx * 0.1;
+            const rot = time * speed;
+            cube.rotation.x = rot;
+            cube.rotation.y = rot;
+          });
+          renderer.render(scene, camera);
+          requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+              
+        const cam = new OrbitControls(camera, canvas);
+        cam.damping = true;
+        cam.dampFactor = 0.5;
+        cam.zoom = true;
+      }
+
+      main();
+    </script>
+  </body>
+</html>
